@@ -1,0 +1,11 @@
+# Instalación / Docker y ediciones
+
+## Clases `Ens.*`/`EnsLib.*` "no existen" en un namespace de IRIS Community Edition (Docker) pese a estar disponibles en la licencia
+
+**Síntoma:** Al compilar clases propias que referencian `Ens.BusinessService`, `Ens.Request`, `EnsLib.HTTP.OutboundAdapter`, `EnsLib.Testing.Service`, etc. en una instancia de IRIS Community o IRIS for Health Community (Docker), el compilador reporta que la clase Ensemble referenciada no existe — incluso con el manifiesto del Installer marcando `Ensemble="1"` para el namespace.
+
+**Causa:** Interoperability (el paquete `ENSLIB`/`Ens.*`, incluyendo `EnsLib.Testing.Service`) está disponible en Community Edition — no es una feature de licencia superior — pero el namespace necesita quedar explícitamente habilitado para Interoperability, y el flag del manifiesto del Installer no siempre alcanza en un build automatizado de Docker.
+
+**Solución / workaround:** Correr `do ##class(%EnsembleMgr).EnableNamespace("MiNamespace")` (namespace real, no una variable) después del setup del Installer y antes de compilar las clases que dependen de `Ens.*`/`EnsLib.*`, y recompilar. Este workaround viene de un hilo de la Developer Community (autor por identificar; ver `references/comunidad.json` (`scripts/comunidad.py show`), veredicto sin verificar — el dato de disponibilidad de `Ens.*`/`EnsLib.*` en Community Edition sí quedó confirmado independientemente vía documentación oficial, pero la efectividad puntual de `EnableNamespace` como fix no se reprodujo empíricamente en un build propio todavía).
+
+Fuente: [Missing Ensemble Classes in IRIS for Health Community Docker](https://community.intersystems.com/post/missing-ensemble-classes-iris-health-community-docker), InterSystems Developer Community — 2026-07-10. Disponibilidad de `Ens.*`/`EnsLib.*` (incluyendo `EnsLib.Testing.Service`) en Community Edition confirmada vía Documatic de IRIS Data Platform / Health Connect 2024.3–2026.1 y [Deploy and Explore InterSystems IRIS Community Edition](https://docs.intersystems.com/irislatest/csp/docbook/DocBook.UI.Page.cls?KEY=ACLOUD) (docs.intersystems.com) — confirma namespace USER con Interoperability habilitada por defecto en Community Edition — 2026-07-10.

@@ -1,0 +1,102 @@
+{
+  "_legend": {
+    "confirmada": "el usuario que preguntó dijo que sí funcionó, o quedó confirmado después por documentación oficial o por un experimento propio.",
+    "refutada": "era falso o no funcionó en absoluto; daña la reputación del autor.",
+    "no_aplico": "la propuesta era razonable pero no resolvió ese caso puntual; no daña la reputación del autor (se corrige el par problema-solución en el capítulo, no el historial del usuario).",
+    "sin_verificar": "el usuario dijo \"no estoy seguro\" o todavía no se pronunció."
+  },
+  "usuarios": [
+    {
+      "slug": "francisco-lópez1549",
+      "nombre": "Kurro Lopez",
+      "perfil": "https://community.intersystems.com/user/francisco-l%C3%B3pez1549",
+      "propuestas": [
+        {
+          "propuesta": "Abrió el hilo preguntando cómo convertir un datetime ISO 8601 a ObjectScript datetime; confirmó (\"Thanks.. the 3,5 was the answer... now it's working!!!\") la propuesta de Vitaliy Serdtsev, pero esa propuesta en realidad ignora el offset -- su confirmación describe que el string parseó sin error, no que la conversión de zona horaria sea correcta.",
+          "url": "https://community.intersystems.com/post/how-convert-datetime-iso-8601-objectscript-datetime",
+          "usado_en": null,
+          "veredicto": "sin_verificar",
+          "nota": "No propuso una solución propia -- solo abrió el hilo; su reputación de autor de preguntas no se ve afectada por este caso. No se registra como confirmación de la propuesta de Vitaliy.",
+          "fecha": null
+        }
+      ]
+    },
+    {
+      "slug": "vitaliy-serdtsev2149",
+      "nombre": "Vitaliy Serdtsev",
+      "perfil": "https://community.intersystems.com/user/vitaliy-serdtsev2149",
+      "propuestas": [
+        {
+          "propuesta": "$ZDATETIMEH(isoString,3,5) (abreviado $zdth) para convertir un string ISO 8601 con offset (\"2021-11-04T11:10:00+0100\") a $H.",
+          "url": "https://community.intersystems.com/post/how-convert-datetime-iso-8601-objectscript-datetime",
+          "usado_en": "desarrollo/fechas-y-datetime.md (como ejemplo de qué NO usar)",
+          "veredicto": "refutada",
+          "nota": "Refutada para el problema de fondo (el offset), probado con curl contra la doc oficial de $ZDATETIMEH: el offset de tformat=5 \"may be supplied, but is ignored\"; +0100/+0200/-0100 dan el mismo $H. No daña la reputación por mala fe -- el string sí parsea sin error, el resultado es silenciosamente incorrecto para conversión de zona horaria.",
+          "fecha": "2026-07-10"
+        },
+        {
+          "propuesta": "Método Iso8601ToTimeStamp(ts) usando ##class(%TimeStamp).XSDToLogical($e(ts,1,22)_\":\"_$e(ts,*-1,*)) (inserta ':' en el offset) para convertir 4 ISO 8601 distintos con resultados correctos y diferenciados por offset.",
+          "url": "https://community.intersystems.com/post/how-convert-datetime-iso-8601-objectscript-datetime",
+          "usado_en": "desarrollo/fechas-y-datetime.md",
+          "veredicto": "confirmada",
+          "nota": "Verificado independientemente contra la doc oficial de %Library.TimeStamp (parámetro XMLTIMEZONE=UTC, método XSDToLogical) vía curl. No fue confirmada por el autor original del hilo (posiblemente llegó después de su último comentario).",
+          "fecha": "2026-07-10"
+        }
+      ]
+    },
+    {
+      "slug": "julius-kavay",
+      "nombre": "Julius Kavay",
+      "perfil": "https://community.intersystems.com/user/julius-kavay",
+      "propuestas": [
+        {
+          "propuesta": "El offset de tformat 5 (y también 6, 7, 8) en $ZDATETIMEH es ignorado según la doc oficial -- lo demuestra con 3 ejemplos (+0100, +0200, -0100) que dan el mismo resultado.",
+          "url": "https://community.intersystems.com/post/how-convert-datetime-iso-8601-objectscript-datetime",
+          "usado_en": "desarrollo/fechas-y-datetime.md",
+          "veredicto": "confirmada",
+          "nota": "Verificado independientemente contra la página oficial de $ZDATETIMEH vía curl (mismo texto citado: \"may be supplied, but is ignored\"). También propuso un método propio TimeZoneToHorolog(tz) como alternativa manual; no se verificó ni se incluyó en el capítulo por no tener ejemplos de prueba en el hilo.",
+          "fecha": "2026-07-10"
+        }
+      ]
+    }
+  ],
+  "por_identificar": {
+    "nota": "0 confirmadas, 0 refutadas, 4 sin verificar -- no hay historial de reputación todavía: los aportes de abajo no tienen autor identificado (migrados del registro anterior). Completar el autor (y evaluar su reputación individual, separándolo de este cajón genérico) la próxima vez que se vuelva a visitar cada hilo -- pedir la página con curl y un User-Agent de navegador normal en vez de WebFetch suele esquivar el 403, como se hizo para el hilo de fechas ISO 8601.",
+    "aportes": [
+      {
+        "propuesta": "Correr ##class(%EnsembleMgr).EnableNamespace(\"MiNamespace\") cuando Ens.*/EnsLib.* aparecen como inexistentes en IRIS Community/Docker pese a estar disponibles en la edición.",
+        "url": "https://community.intersystems.com/post/missing-ensemble-classes-iris-health-community-docker",
+        "usado_en": "arquitectura/instalacion-y-ediciones.md",
+        "veredicto": "sin_verificar",
+        "nota": "El dato de que Ens.*/EnsLib.* existen en Community Edition se confirmó independientemente vía documentación oficial, pero el fix puntual (EnableNamespace) no se reprodujo empíricamente todavía."
+      },
+      {
+        "propuesta": "Patrón \"substitute operation\" para testing de integración de un flujo BS→BP→BO completo -- un BO alternativo con el mismo contrato de mensajes que hace trabajo local determinista, sin tocar el BO real.",
+        "url": "https://community.intersystems.com/post/how-do-you-approach-integration-testing-full-bs-bp-bo-flow-iris",
+        "usado_en": "testing/testing-de-productions.md",
+        "veredicto": "sin_verificar",
+        "nota": "El patrón es coherente con el diseño de Productions, pero no se armó un caso propio para confirmarlo."
+      },
+      {
+        "propuesta": "Relato de un mismatch de Message Schema Category entre el Test de una DTL y la Production real como causa de que un campo HL7 se transforme distinto en cada contexto.",
+        "url": "https://community.intersystems.com/post/hl7-message-test-fine-dtl-message-not-transformed-correctly-end-end-test",
+        "usado_en": "desarrollo/dtl-y-hl7.md",
+        "veredicto": "sin_verificar",
+        "nota": "Ilustra un síntoma plausible y coherente con cómo funciona el Schema Category, pero no se reprodujo en un proyecto propio."
+      },
+      {
+        "propuesta": "Hilo \"Indices Not Working\" -- posible relación con clases %Persistent que no muestran filas en SQL hasta reconstruir índices.",
+        "url": "https://community.intersystems.com/post/indices-not-working",
+        "usado_en": "desarrollo/persistencia-y-sql.md",
+        "veredicto": "sin_verificar",
+        "nota": "Encontrado al investigar el gotcha de %BuildIndices, pero nunca se leyó en profundidad; queda pendiente confirmar si describe el mismo escenario de build-then-seed."
+      }
+    ]
+  },
+  "notas": [
+    {
+      "fecha": "2026-07-10",
+      "texto": "Corrección de atribución: una primera pasada por el hilo de fechas ISO 8601 (con WebFetch, que devuelve 403 sobre community.intersystems.com) solo tenía resúmenes de WebSearch y atribuyó mal los roles: Kurro Lopez es quien abrió el hilo preguntando, no quien propuso la solución. Pidiendo la página con curl y un User-Agent de navegador normal se pudo leer el HTML completo y corregir la atribución, más un detalle que los resúmenes no traían: la primera propuesta del hilo ($ZDATETIMEH(...,3,5)) en realidad no resuelve el offset, confirmado leyendo también la documentación oficial con el mismo método curl. Ver desarrollo/fechas-y-datetime.md."
+    }
+  ]
+}

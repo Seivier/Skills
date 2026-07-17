@@ -1,0 +1,11 @@
+# Persistencia y SQL: `%Persistent`, `%Save()` e índices
+
+## Una clase `%Persistent` recién poblada por `%Save()` puede dar 0 filas en SQL hasta correr `%BuildIndices()`
+
+**Síntoma:** Justo después de compilar una clase `%Persistent` y llamar a `%Save()` para insertar una fila (por ejemplo, en un script de seed de datos de prueba — ver `testing/testing-de-productions.md` para el contexto típico de esto), una consulta SQL por `ID` encuentra el registro (`WHERE ID = 1` funciona), pero `WHERE <columna-no-ID> = <valor>` o `SELECT COUNT(*)` devuelven 0 filas, aunque los datos existen y son correctos (verificado abriendo el objeto por `%OpenId`).
+
+**Causa:** El acceso por `ID` usa el master map (siempre actualizado por `%Save()`), pero el extent bitmap index (usado por `COUNT(*)` y por el plan de consulta de columnas no indexadas) puede quedar sin poblar si la secuencia compilación → inserción de datos no dispara la construcción normal del índice — algo que puede ocurrir en scripts de build/seed automatizados que compilan la clase e insertan datos en la misma pasada.
+
+**Solución / workaround:** Llamar explícitamente a `##class(Mi.Clase).%BuildIndices()` después de sembrar datos de prueba en scripts de build, antes de asumir que las consultas SQL van a encontrar lo recién insertado.
+
+Fuente: verificado empíricamente — una clase persistente de prueba, sandbox Docker IRIS Community 2026.1 — 2026-07-08. (Nota: no encontrado documentado explícitamente para este escenario exacto en docs.intersystems.com; la documentación oficial sobre `%BuildIndices` describe el comportamiento general de reconstrucción de índices y bitmap extent index, no este caso puntual de build-then-seed. Marcar como gotcha empírico, no como comportamiento oficialmente documentado, hasta encontrar una fuente que lo confirme explícitamente.) Al investigar este gotcha se encontró también el hilo de comunidad [Indices Not Working](https://community.intersystems.com/post/indices-not-working) (InterSystems Developer Community) — no se leyó en profundidad todavía y queda pendiente confirmar si describe exactamente este mismo escenario de build-then-seed; ver `references/comunidad.json` (`scripts/comunidad.py show`) (autor por identificar, veredicto sin verificar).
